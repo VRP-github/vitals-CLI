@@ -1,0 +1,46 @@
+<script type="module">
+import { sparkline } from './dist/index.mjs';
+
+const BUFFER_SIZE = 40;
+const REFRESH_RATE = 200;
+let dataBuffer = Array(BUFFER_SIZE).fill(0);
+
+const dashboardTheme = {
+  low: '#00f3ff',
+  mid: '#bd00ff',
+  high: '#ff0055'
+};
+
+console.log("%cStarting Live Monitor...", "color: lime; font-size: 14px;");
+
+const intervalId = setInterval(() => {
+  const incomingData = Math.floor(Math.random() * 90) + 10;
+  
+  dataBuffer.shift();
+  dataBuffer.push(incomingData);
+
+  console.clear();
+
+  const currentLoad = incomingData.toString().padStart(3, ' ');
+  console.log(
+    `%c 🖥️ SYSTEM MONITOR | CPU: ${currentLoad}% | MEM: 4.2GB `, 
+    "background: #222; color: #fff; padding: 5px; border-radius: 4px; font-weight: bold;"
+  );
+
+  console.log(
+    ...sparkline(dataBuffer, { 
+      browser: true, 
+      heatmap: true, 
+      smooth: true, 
+      size: 'xl', 
+      style: 'bar',
+      theme: dashboardTheme
+    })
+  );
+
+  console.log("%c(Press Refresh to stop)", "color: #555; font-size: 10px; margin-top: 10px;");
+
+}, REFRESH_RATE);
+
+window.addEventListener('beforeunload', () => clearInterval(intervalId));
+</script>
